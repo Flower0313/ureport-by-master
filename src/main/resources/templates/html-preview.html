@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/static/ureport-asserts/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/static/ureport-asserts/css/bootstrap-datetimepicker.css}" rel="stylesheet" type="text/css"/>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+    <title th:text="${title}"></title>
+    <style type="text/css" id="_ureport_table_style" th:text="${style}">
+    </style>
+    <script type="text/javascript" th:src="@{/static/ureport-asserts/venderjs/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/ureport-asserts/venderjs/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/ureport-asserts/venderjs/Chart.bundle.min.js}"></script>
+    <script type="text/javascript"
+            th:src="@{/static/ureport-asserts/venderjs/chartjs-plugin-datalabels.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/ureport-asserts/venderjs/bootstrap-datetimepicker.js}"></script>
+    <script type="text/javascript" th:src="@{/static/ureport-asserts/js/preview.bundle.js}"></script>
+    <script type="text/javascript" th:src="@{/static/ureport-asserts/js/glDatePicker.min.js}"></script>
+
+</head>
+<body style="margin:5px">
+<div th:utext="${upSearchFormHtml}"></div>
+<div style="border:solid 1px #ddd;border-radius:5px;height:35px;width:100%;margin-bottom:5px;background:#f8f8f8"
+     th:if="${tools != null && tools.show != null && tools.show == true}">
+    <div style="text-align:${reportAlign}">
+        <button type="button" class="btn btn-default ureport-print"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="在线打印"
+                th:if="${tools.print}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/print.svg'" width="20px" height="20px">
+        </button>
+        <button type="button" class="btn btn-default ureport-pdf-direct-print"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="PDF在线打印"
+                th:if="${tools.pdfPrint}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/pdf-direct-print.svg'" width="20px"
+                 height="20px">
+        </button>
+        <button type="button" class="btn btn-default ureport-pdf-print"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="PDF在线预览打印"
+                th:if="${tools.pdfPreviewPrint}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/pdf-print.svg'" width="20px" height="20px">
+        </button>
+        <button type="button" class="btn btn-default ureport-export-pdf"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="导出PDF"
+                th:if="${tools.pdf}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/pdf.svg'" width="20px" height="20px">
+        </button>
+        <button type="button" class="btn btn-default ureport-export-word"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="导出WORD"
+                th:if="${tools.word}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/word.svg'" width="20px" height="20px">
+        </button>
+        <button type="button" class="btn btn-default ureport-export-excel"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="分页导出EXCEL"
+                th:if="${tools.excel}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/excel.svg'" width="20px" height="20px">
+        </button>
+        <button type="button" class="btn btn-default ureport-export-excel-paging"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="导出EXCEL"
+                th:if="${tools.pagingExcel}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/excel-paging.svg'" width="20px" height="20px">
+        </button>
+        <!--<button type="button" class="btn btn-default ureport-export-excel-paging-sheet"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="分页分Sheet导出EXCEL"
+                th:if="${tools.sheetPagingExcel}">
+            <img th:src="#{context-path} + '/static/ureport-asserts/icons/excel-with-paging-sheet.svg'" width="20px"
+                 height="20px">
+        </button>-->
+        <div class="btn-group" th:if="${tools.sheetPagingExcel}">
+            <!--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                    style="background:#f8f8f8;border:none;color:#337ab7">
+                <span th:text="${pageIndex>0 ? '分页预览' : '预览'}"></span>
+                <span class="caret"></span>
+            </button>-->
+            <ul class="dropdown-menu" role="menu">
+                <li th:if="${hasTools}"><a th:href="${'preview?_u=' + file + '&_t=' + _t + '&' + customParameters}"
+                                           style="color:#337ab7">预览</a></li>
+                <li th:else><a th:href="${'preview?_u=' + file + '&' + customParameters}" style="color:#337ab7">预览</a>
+                </li>
+                <!--<li th:if="${hasTools}"><a th:href="${'preview?_u=' + file + '&_i=1&_t=1&' + customParameters}"
+                                           style="color:#337ab7">分页预览</a></li>
+                <li th:else><a th:href="${'preview?_u=' + file + '&_i=1&' + customParameters}" style="color:#337ab7">分页预览</a>-->
+                </li>
+            </ul>
+        </div>
+        <!--<div th:switch="${needed}">
+            <p th:case="'true'">User is an administrator</p>
+            <p th:case="'false'">User is a manager</p>
+        </div>-->
+
+        <!--<label>开始时间:</label>-->
+        <!--<select id="startTime" class="form-control"
+                style="display:inline-block;width:inherit;font-size:13px;height:28px;margin-top:2px">
+            <option th:text="${startTime}"></option>
+        </select>-->
+       <!-- <div class="btn-group">
+            <input type="text" id="startTime" class="datetimepickers" readonly="readonly">
+        </div>-->
+
+
+
+        <!--<label>结束时间:</label>
+        <div class="btn-group">
+            <input type="text" id="endTime" class="datetimepickers" readonly="readonly">
+        </div>-->
+
+        <!--<button id="searchTime" type="button" class="btn btn-default"
+                style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="查询">
+            <a th:href="${'preview?_u=' + file + '&_t=' + _t + '&lst=' +startTime+'&est='+endTime }"
+               style="color:#337ab7">查询</a>
+        </button>-->
+        <!--<button id="fuckall">查询</button>-->
+
+        <span id='pagingContainer' style="font-size:14px;margin-left:1px;color:#337ab7" th:if="${pageIndex>0}">
+			共<span id='totalPageLabel' th:text="${totalPageWithCol}"></span>页
+			<select id="pageSelector" class="form-control"
+                    style="display:inline-block;width:inherit;font-size:13px;height:28px;margin-top:2px">
+				<option th:each="index : ${#numbers.sequence(1, totalPageWithCol)}" th:text="${index}"
+                        th:value="${index}"></option>
+			</select>
+			<span id='pageLinkContainer'></span>
+		</span>
+    </div>
+</div>
+<div th:text="${downSearchFormHtml}"></div>
+<h2 th:text="${isnull}" style="text-align:center"></h2>
+<div id="_ureport_table" style="float:${reportAlign}" th:utext="${content}">
+</div>
+<iframe name="_print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
+<iframe name="_print_pdf_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
+<script type="text/javascript" th:inline="javascript">
+    window._server = [[#{context-path}]] + "";
+    window.formElements = [];
+    $(document).ready(function () {
+
+        buildPaging([[${pageIndex}]], [[${totalPageWithCol}]]);
+
+        var refVal = [[${intervalRefreshValue}]];
+        if (refVal > 0) {
+            _intervalRefresh([[${intervalRefreshValue}]], [[${totalPageWithCol}]]);
+        }
+
+        eval([[${searchFormJs}]])
+
+        var chartData = [[${chartDatas}]];
+        if (chartData != null && chartData != "") {
+            _buildChartDatas(JSON.parse([[${chartDatas}]]));
+        }
+
+        function doSearch() {
+            submitSearchForm([[${file}]], [[${customParameters}]]);
+        }
+    });
+</script>
+</body>
+</html>
