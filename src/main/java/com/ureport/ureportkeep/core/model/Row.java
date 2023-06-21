@@ -24,10 +24,12 @@ import java.util.List;
  * @author Jacky.gao
  * @since 2016年11月1日
  */
+
 public class Row extends Line{
 	private int height;
 	private int realHeight=-1;
 	private String rowKey;
+
 	/**
 	 * 一个用来临时存放当前行号的属性，只在构建报表时创建新行时使用
 	 */

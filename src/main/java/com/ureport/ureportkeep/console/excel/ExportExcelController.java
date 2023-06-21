@@ -106,6 +106,7 @@ public class ExportExcelController extends AbstractReportBasicController {
         //只针对薪资文件
         boolean ifSalary = req.getParameter("_u").contains("salary");
         StringBuilder titleParam = new StringBuilder("\\'");
+        int len = 0;
         //并且还要是薪资文件
         //全量薪资
         if (ifSalary) {
@@ -127,13 +128,16 @@ public class ExportExcelController extends AbstractReportBasicController {
                     titleParam.append(map.get(columns.get(i)).getFormatData().toString()).append("\\',\\'");
                 }
             }
+            len = si.toString().length() - si.toString().replace(",", "").length();
         }
         String loadFileName = "";
-        if (si == null && ifSalary && !"".equals(loadFileName = downloadDataxSalaryAll(titleParam))) {
+        /*
+        * if (si == null && ifSalary && !"".equals(loadFileName = downloadDataxSalaryAll(titleParam))) {
             realDownloadAction(resp, dataxfilepath, loadFileName);
-        } else if (ifSalary && Objects.requireNonNull(si).toString().contains(",") && !"".equals(loadFileName = downloadDataxSalaryMore(si.toString(), titleParam))) {
+        } else
+        * */
+        if (ifSalary && (len > 3 || (si.toString().contains("29") && len > 1)) && !"".equals(loadFileName = downloadDataxSalaryMore(si.toString(), titleParam))) {
             //非全量但多个薪资
-            //System.out.println("download more salary data...");
             realDownloadAction(resp, dataxfilepath, loadFileName);
         } else {
             buildExcel(req, resp, true, false);
@@ -207,7 +211,8 @@ public class ExportExcelController extends AbstractReportBasicController {
             File file = new File(dataxfilepath + fileName);
             CSVReader reader = new CSVReader(new FileReader(file));
             SXSSFWorkbook workbook = new SXSSFWorkbook();
-            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(dataxfilepath + fileName + "tmp"));
+            String csvFileName = fileName + ".xls";
+            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(dataxfilepath + csvFileName));
             SXSSFSheet sheet = workbook.createSheet();
             int index = 0;
             // 获取数据
@@ -221,7 +226,10 @@ public class ExportExcelController extends AbstractReportBasicController {
             workbook.dispose();
             outputStream.close();
             reader.close();
-            return fileName + "tmp";
+            //删除原文件
+            File deleteFile = new File(dataxfilepath + fileName);
+            deleteFile.delete();
+            return csvFileName;
         } catch (Exception e) {
             e.printStackTrace();
             return "";
@@ -271,16 +279,19 @@ public class ExportExcelController extends AbstractReportBasicController {
         //先根据传过来的文件更名，然后下载，若这个文件没有的话就遍历然后再下载时间戳最大的
         String readyToLoad = "";
         if (!"".equals(loadFileName)) {
-            readyToLoad = getSingleFileName(loadFileName);
+            //readyToLoad = getSingleFileName(loadFileName);
+            readyToLoad = CsvToElxs(loadFileName);
         } else {
             readyToLoad = getFileName();
         }
         FileSystemResource file = new FileSystemResource(dataxfilepath + readyToLoad);
-        String filename = file.getFilename();
+        //String filename = file.getFilename();
         InputStream inputStream = null;
         BufferedInputStream bufferedInputStream = null;
         BufferedOutputStream bufferedOutputStream = null;
-        resp.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+        //将文件变成excel格式
+        resp.setCharacterEncoding("utf-8");
+        resp.setContentType("APPLICATION/vnd.ms-excel");
         try {
             inputStream = file.getInputStream();
             bufferedInputStream = new BufferedInputStream(inputStream);

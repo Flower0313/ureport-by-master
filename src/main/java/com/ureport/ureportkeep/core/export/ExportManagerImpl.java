@@ -15,10 +15,12 @@
  ******************************************************************************/
 package com.ureport.ureportkeep.core.export;
 
+import com.alibaba.excel.EasyExcel;
 import com.ureport.ureportkeep.core.build.paging.Page;
 import com.ureport.ureportkeep.core.cache.CacheUtils;
 import com.ureport.ureportkeep.core.chart.ChartData;
 import com.ureport.ureportkeep.core.definition.ReportDefinition;
+import com.ureport.ureportkeep.core.definition.RowDefinition;
 import com.ureport.ureportkeep.core.export.excel.high.ExcelProducer;
 import com.ureport.ureportkeep.core.export.excel.low.Excel97Producer;
 import com.ureport.ureportkeep.core.export.html.HtmlProducer;
@@ -32,8 +34,8 @@ import com.ureport.ureportkeep.core.model.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -147,10 +149,29 @@ public class ExportManagerImpl implements ExportManager {
         String file = config.getFile();
         Map<String, Object> parameters = config.getParameters();
         ReportDefinition reportDefinition = reportRender.getReportDefinition(file);
+
         //到这里小数点数据都还没变
         Report report = reportRender.render(reportDefinition, parameters);
-        excelProducer.produceWithPaging(report, config.getOutputStream());
+
+        EasyExcel.write(config.getOutputStream()).sheet("sheet").doWrite(data(report.getRows()));
+        //excelProducer.produceWithPaging(report, config.getOutputStream());//原下载模式
     }
+
+    /**
+     * 头信息
+     *
+     * @param row 数据集合
+     * @return
+     */
+    private List<List<Object>> data(List<Row> row) {
+        return row.stream()
+                .map(r -> r.getCells().stream()
+                        .sorted(Comparator.comparing(c -> c.getIncreaseSpanCellNames().size()))
+                        .map(Cell::getData)
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public void exportExcel97WithPaging(ExportConfigure config) {

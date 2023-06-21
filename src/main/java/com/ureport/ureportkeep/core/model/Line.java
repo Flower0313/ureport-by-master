@@ -16,6 +16,7 @@
 package com.ureport.ureportkeep.core.model;
 
 import com.ureport.ureportkeep.core.definition.CellStyle;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
  * @author Jacky.gao
  * @since 2016年11月1日
  */
+@ToString
 public abstract class Line{
 	private CellStyle customCellStyle;
 	private List<Cell> cells=new ArrayList<Cell>();

@@ -8,5 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UreportKeepApplication {
     public static void main(String[] args) {
         SpringApplication.run(UreportKeepApplication.class, args);
+        System.out.println("======================== by-ureport启动成功 ========================");
     }
 }
